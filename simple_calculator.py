@@ -1,7 +1,9 @@
 
+from tkinter import Tk,messagebox,Label,Entry,IntVar,Checkbutton,Button,END
 
 class Calculator:
     def __init__(self):
+        self.__root__ = Tk()
         self.operand_1 = None
         self.operand_2 = None
         self.__operand__ = ""
@@ -21,27 +23,26 @@ class Calculator:
 
     def __displayButton__(self):
         self.metaLabel()
-        width = 9
-        height = 3
+
         for button in self.buttons:
             if button == "=":
-                Button(self.__buttonFrame__, text=button,  font=("Arial", 12),height=height, width=width * 2 + 1, justify="center", background="blue",
-                       fg="white", activeforeground="skyblue",
+                Button(self.__buttonFrame__, text=button,  font=("Arial", 12),height=self.height, width=self.width * 2 + 1, justify="center", background=self.button_bg,
+                       fg="white", activeforeground=self.button_afg,
                        command=lambda __value__=button: self.__buttonClick__(__value__)).grid(row=self.__rowValue__+1,
                                                                                               column=1,columnspan = 2 )
             elif button == "Exit":
-                Button(self.__exitFrame__, text="Exit", command=self.__root__.destroy, fg="BLUE", background="lightblue", justify="left",
-                       width=7, relief="groove", anchor="center", font=("Arial",10)).grid(row=self.__rowValue__, column=1, columnspan=2)
+                Button(self.__exitFrame__, text="Exit", command=self.exitCallback, fg=self.exitButton_fg, background=self.exitButton_bg, justify="left",activeforeground=self.exitButton_fg,
+                       width=self.width, relief="groove", anchor="center", font=("Arial",10)).grid(row=self.__rowValue__, column=1, columnspan=2)
             elif button == "Settings":
-                Button(self.__buttonFrame__, text=button, font=("Arial", 12), height=height, width=width, justify="center", background="blue",
-                       fg="white", activeforeground="skyblue",
+                Button(self.__buttonFrame__, text=button, font=("Arial", 12), height=self.height, width=self.width, justify="center", background=self.button_bg,
+                       fg=self.button_fg, activeforeground=self.button_afg,
                        command=self.settingsCallback).grid(row=self.__rowValue__ +1, column=3)
 
             else:
                 if self.__columnValue__ & 3 == 0:
                     self.__rowValue__ += 1
                     self.__columnValue__ = 1
-                Button(self.__buttonFrame__, font=("Arial", 12), text=button, height=3, width=width, justify="center", background="blue", fg="white", activeforeground="skyblue",
+                Button(self.__buttonFrame__, font=("Arial", 12), text=button, height=3, width=self.width, justify="center", background=self.button_bg, fg=self.button_fg, activeforeground=self.button_afg,
                        command=lambda __value__ = button:self.__buttonClick__(__value__)).grid(row=self.__rowValue__,column=self.__columnValue__)
                 self.__columnValue__ +=1
 
@@ -66,6 +67,16 @@ class Calculator:
         elif self.__clickValue__ == "=":
             self.solve()
             self.resetOperands()
+    def buttonParameters(self,frame_bg ="lightblue" ,button_bg="blue",button_fg="white",exitButton_fg="lightblue",exitButton_bg="skyblue",button_afg="white",height=3,width=9):
+        self.button_bg = button_bg
+        self.button_fg = button_fg
+        self.button_afg = button_afg
+        self.height = height
+        self.width = width
+        self.frame_bg = frame_bg
+        self.exitButton_fg = exitButton_fg
+        self.exitButton_bg = exitButton_bg
+
 
     def displayPreviousResult(self,__value__):
         self.__value__ = __value__
@@ -90,6 +101,11 @@ class Calculator:
         self.__operand__ = ""
         self.operandExpression = None
 
+    def exitCallback(self):
+        self.exit_messagebox = messagebox.askyesnocancel("Exit","Do you want to exit ?")
+        if self.exit_messagebox:
+            self.__root__.destroy()
+
     def metaLabel(self):
         self.centerMetaFrame = Label(self.__metaFrameHandler__,width=22,background="skyblue",height=2)
         self.getState = IntVar()
@@ -111,12 +127,12 @@ class Calculator:
 
 
     def __frameHandler__(self):
-        self.__root__ = Tk()
-        self.__mainCalculatorWidget__ = Label(self.__root__,background="lightblue")
+        self.__mainCalculatorWidget__ = Label(self.__root__,background=self.frame_bg)
         self.entry = Entry(self.__mainCalculatorWidget__,justify="left",width=40)
         self.__buttonFrame__ = Label(self.__mainCalculatorWidget__, bg="skyblue")
         self.__metaFrameHandler__ = Label(self.__mainCalculatorWidget__,background="skyblue")
         self.__exitFrame__ = Label(self.__mainCalculatorWidget__,background="lightblue")
+
 
     def __gridHandlerAndMainloop__(self):
         self.__mainCalculatorWidget__.grid(row=0,column=0)
@@ -129,7 +145,12 @@ class Calculator:
 
         self.__root__.mainloop()
 
+    def calculatorGeometry(self,title,height,width):
+        self.__root__.geometry(f"{width}x{height}")
+        self.__root__.title(title)
+
     def activate(self):
+        self.buttonParameters()
         self.__frameHandler__()
         self.__displayButton__()
         self.__gridHandlerAndMainloop__()
@@ -137,9 +158,7 @@ class Calculator:
 
 
 
-
-
-from tkinter import *
-
-calculator = Calculator()
-calculator.activate()
+if __name__ == "main":
+    print("Sorry can run stand alone file")
+else:
+    calculator = Calculator()
